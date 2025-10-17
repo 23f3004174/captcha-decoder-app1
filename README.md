@@ -1,53 +1,43 @@
 # CAPTCHA OCR Decoder
 
 ## Overview
-This is a simple web app that lets you upload a CAPTCHA image and automatically decodes its text using Python OCR (pytesseract). The server preprocesses the image (denoising, contrast enhancement, binarization) to improve recognition, then runs Tesseract via pytesseract and shows the result on the page.
-
-Key features:
-- Image upload form (browser-based UI)
-- Python backend with Flask
-- OCR via pytesseract (Tesseract engine)
-- Displays decoded text and previews of original and preprocessed images
+A simple web app for uploading a CAPTCHA image and decoding its text using Python's pytesseract (Tesseract OCR). It includes light preprocessing to improve recognition and displays both the original and preprocessed images alongside the detected text.
 
 ## Setup
+- Requirements:
+  - Python 3.8+
+  - Tesseract OCR engine installed on your system
+  - Python packages: Flask, Pillow, pytesseract
 
-1. Install system Tesseract OCR:
-   - macOS (Homebrew):
-     - brew install tesseract
-   - Ubuntu/Debian:
-     - sudo apt-get update
-     - sudo apt-get install -y tesseract-ocr
-   - Windows:
-     - Download and install from https://github.com/tesseract-ocr/tesseract
-     - After installing, ensure tesseract.exe is on your PATH. If not, you can set:
-       - In Python: pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+- Install Tesseract:
+  - macOS (Homebrew): brew install tesseract
+  - Ubuntu/Debian: sudo apt-get update && sudo apt-get install -y tesseract-ocr
+  - Windows: Download installer from https://github.com/tesseract-ocr/tesseract and add tesseract.exe to PATH (or set TESSERACT_CMD env var)
 
-2. Create and activate a Python environment (optional but recommended):
-   - python -m venv .venv
-   - On macOS/Linux: source .venv/bin/activate
-   - On Windows: .venv\Scripts\activate
+- Install Python dependencies:
+  - pip install flask pillow pytesseract
 
-3. Install Python dependencies:
-   - pip install Flask pillow pytesseract
+- Optional: If Tesseract is not on PATH, set the environment variable:
+  - macOS/Linux: export TESSERACT_CMD=/usr/local/bin/tesseract
+  - Windows (PowerShell): setx TESSERACT_CMD "C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 ## Usage
-
 1. Run the app:
    - python index.html
+   - By default it starts at http://localhost:8000
 
-   The server starts on http://localhost:5000 (or the PORT defined in your environment).
-
-2. Open the app in your browser:
-   - Navigate to http://localhost:5000
-
-3. Upload a CAPTCHA image:
-   - Click “Choose File”, select your image, then “Decode CAPTCHA”.
-   - The page will display:
-     - Decoded text result
+2. In your browser:
+   - Open http://localhost:8000
+   - Upload a CAPTCHA image (PNG/JPG/etc.)
+   - Click "Decode" to see:
      - Original image preview
-     - Preprocessed image preview (what is fed to OCR)
+     - Preprocessed image (grayscale + threshold)
+     - Extracted text
 
-Tips:
-- Single-line, high-contrast CAPTCHAs work best.
-- If no text is detected, try adjusting your image quality or contrast.
-- On Windows, if you see “TesseractNotFoundError,” set the tesseract executable path as mentioned above.
+Tip: Higher contrast and cleaner inputs yield better OCR. You can tweak the threshold value in preprocess_for_captcha if needed.
+
+## Improvements from previous version (Round 2)
+- Added preprocessing: grayscale, median denoise, and binary threshold to improve OCR accuracy on noisy CAPTCHAs.
+- Restricted Tesseract to single-line mode with an alphanumeric whitelist for better precision on typical CAPTCHAs.
+- Inline previews: show both original and preprocessed images for transparency and easier debugging.
+- Robustness: basic file type validation, clearer error messages, and optional TESSERACT_CMD configuration for portability.
